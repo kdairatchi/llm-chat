@@ -1,0 +1,271 @@
+/**
+ * Training Data for LLM Chat Application
+ * 
+ * Contains training examples, system prompts, and reference data
+ * for the Grey Hack LLM chat assistant.
+ */
+
+import { ChatMessage } from "./types";
+
+/**
+ * Enhanced system prompt with GreyScript context
+ */
+export const SYSTEM_PROMPT = `You are a helpful GreyScript programming assistant for Grey Hack.
+
+You have deep knowledge of the GreyScript API and can help users:
+- Write GreyScript programs
+- Debug scripts
+- Understand API methods and objects
+- Optimize code for Grey Hack
+
+Always provide accurate, concise responses with code examples when helpful.
+Reference the GreyScript API documentation when needed.`;
+
+/**
+ * Training examples for the chat assistant
+ * These help the model understand common questions and provide better responses
+ */
+export const TRAINING_EXAMPLES: ChatMessage[][] = [
+	[
+		{
+			role: "user",
+			content: "How do I connect to a remote server using SSH?",
+		},
+		{
+			role: "assistant",
+			content: `You can connect to a remote SSH server using the \`connect_service\` method:
+
+\`\`\`greyhack
+shell = get_shell
+remoteShell = shell.connect_service("1.1.1.1", 22, "username", "password")
+if typeof(remoteShell) != "shell" then
+    print "Connection failed: " + remoteShell
+else
+    print "Connected successfully!"
+end if
+\`\`\`
+
+The method takes:
+- IP address (string)
+- Port number (usually 22 for SSH)
+- Username (string)
+- Password (string)
+- Optional service type (defaults to "ssh")`,
+		},
+	],
+	[
+		{
+			role: "user",
+			content: "How do I mine cryptocurrency?",
+		},
+		{
+			role: "assistant",
+			content: `To mine cryptocurrency in Grey Hack, you need to:
+
+1. Get a coin object:
+\`\`\`greyhack
+blockchain = include_lib("/lib/blockchain.so")
+coin = blockchain.get_coin("COIN_NAME", "user", "password")
+\`\`\`
+
+2. Get or create a subwallet:
+\`\`\`greyhack
+subWallet = coin.get_subwallet("username")
+\`\`\`
+
+3. Start mining (this blocks the terminal until a coin is mined):
+\`\`\`greyhack
+while subWallet.mining == 1
+    print "Mining...", true
+    print "Balance: " + subWallet.get_balance
+end while
+\`\`\`
+
+The mining process will return 1 each time a coin is successfully mined.`,
+		},
+	],
+	[
+		{
+			role: "user",
+			content: "How do I read a file?",
+		},
+		{
+			role: "assistant",
+			content: `You can read a file using the File object:
+
+\`\`\`greyhack
+hostComputer = get_shell.host_computer
+file = hostComputer.File("/etc/passwd")
+if file != null then
+    content = file.get_content
+    print content
+else
+    print "File not found"
+end if
+\`\`\`
+
+The \`File()\` method returns \`null\` if the file doesn't exist, so always check for that.`,
+		},
+	],
+	[
+		{
+			role: "user",
+			content: "How do I crack WiFi passwords?",
+		},
+		{
+			role: "assistant",
+			content: `WiFi password cracking involves several steps:
+
+1. Scan for networks:
+\`\`\`greyhack
+hostComputer = get_shell.host_computer
+networks = hostComputer.wifi_networks("wlan0").split(char(10))
+\`\`\`
+
+2. Start monitor mode:
+\`\`\`greyhack
+crypto = include_lib("/lib/crypto.so")
+crypto.airmon("start", "wlan0")
+\`\`\`
+
+3. Deauthenticate clients:
+\`\`\`greyhack
+network = networks[1].split(" ")
+bssid = network[0]
+essid = network[1]
+pwr = network[2].to_int
+crypto.aireplay(bssid, essid, 300000 / pwr)
+\`\`\`
+
+4. Crack the password:
+\`\`\`greyhack
+wifiPassword = crypto.aircrack("/home/" + active_user + "/file.cap")
+print "Password: " + wifiPassword
+\`\`\`
+
+Note: You need a capture file (.cap) from the deauthentication process.`,
+		},
+	],
+	[
+		{
+			role: "user",
+			content: "What's the difference between a list and a map?",
+		},
+		{
+			role: "assistant",
+			content: `Lists and maps are different data structures in GreyScript:
+
+**List** - Ordered array of values:
+\`\`\`greyhack
+myList = [1, 2, 3]
+myList.push(4)  // Adds to end
+print myList[0]  // Access by index
+\`\`\`
+
+**Map** - Key-value pairs (like a dictionary):
+\`\`\`greyhack
+myMap = { "name": "Alice", "age": 25 }
+myMap["name"] = "Bob"  // Update by key
+print myMap["name"]  // Access by key
+\`\`\`
+
+Use lists when you need ordered data with numeric indices.
+Use maps when you need to store data with meaningful keys.`,
+		},
+	],
+];
+
+/**
+ * Common GreyScript API patterns and snippets
+ */
+export const CODE_SNIPPETS = {
+	fileOperations: {
+		read: `hostComputer = get_shell.host_computer
+file = hostComputer.File("/path/to/file")
+if file != null then
+    content = file.get_content
+    print content
+end if`,
+		write: `hostComputer = get_shell.host_computer
+file = hostComputer.File("/path/to/file")
+file.set_content("Hello World")`,
+		create: `hostComputer = get_shell.host_computer
+hostComputer.touch("/path/to", "filename.txt")`,
+		delete: `hostComputer = get_shell.host_computer
+file = hostComputer.File("/path/to/file")
+file.delete`,
+	},
+	network: {
+		ssh: `shell = get_shell
+remoteShell = shell.connect_service("1.1.1.1", 22, "user", "pass")
+if typeof(remoteShell) == "shell" then
+    print "Connected!"
+end if`,
+		ping: `shell = get_shell
+if shell.ping("1.1.1.1") == 1 then
+    print "Host is reachable"
+end if`,
+	},
+	blockchain: {
+		createWallet: `blockchain = include_lib("/lib/blockchain.so")
+wallet = blockchain.create_wallet("user", "password")
+if typeof(wallet) == "wallet" then
+    print "Wallet created!"
+end if`,
+		getCoin: `blockchain = include_lib("/lib/blockchain.so")
+coin = blockchain.get_coin("COIN_NAME", "user", "password")
+if typeof(coin) == "coin" then
+    print "Got coin: " + coin.get_address
+end if`,
+	},
+};
+
+/**
+ * API reference quick lookup
+ */
+export const API_REFERENCE = {
+	objects: [
+		"aptClient",
+		"blockchain",
+		"coin",
+		"computer",
+		"crypto",
+		"shell",
+		"router",
+		"port",
+		"wallet",
+		"subWallet",
+	],
+	commonMethods: {
+		file: ["get_content", "set_content", "delete", "copy", "move"],
+		shell: ["connect_service", "ping", "launch", "build"],
+		computer: ["File", "create_folder", "touch", "show_procs"],
+	},
+};
+
+/**
+ * Error handling patterns
+ */
+export const ERROR_PATTERNS = {
+	nullCheck: `result = someMethod()
+if result == null then
+    print "Error: Method returned null"
+    exit
+end if`,
+	typeCheck: `result = someMethod()
+if typeof(result) == "string" then
+    print "Error: " + result
+    exit
+end if`,
+};
+
+/**
+ * Export all training data
+ */
+export const TRAINING_DATA = {
+	systemPrompt: SYSTEM_PROMPT,
+	examples: TRAINING_EXAMPLES,
+	snippets: CODE_SNIPPETS,
+	reference: API_REFERENCE,
+	errorPatterns: ERROR_PATTERNS,
+};
